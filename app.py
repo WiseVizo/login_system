@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, session, redirect, url_for
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'
 
 # Function to get the database connection
 def get_db():
@@ -34,10 +35,10 @@ def login():
     
     cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
     user = cursor.fetchone()
-    
     if user:
-        # session['logged_in'] = True
-        return 'Logged in successfully!'
+        session['logged_in'] = True  # Set session after successful login
+        session['username'] = username  # Store username in session
+        return redirect(url_for('index'))  # Redirect to index page after login also it takes function name not the route name
     else:
         return 'Invalid credentials. Please try again.'
 
@@ -60,6 +61,18 @@ def register_user():
     db.commit()
     
     return 'User registered successfully!'
+
+@app.route('/index')
+def index():
+    # Code to render index.html
+    return render_template('index.html')
+
+# Route to handle logout
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', None)  # Clear username from session if needed
+    return redirect(url_for('login_form'))  # Redirect to login form after logout
 
 if __name__ == '__main__':
     app.run(debug=True)
