@@ -17,6 +17,31 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
+
+# Route for the home page (login form)
+@app.route('/')
+def login_form():
+    return render_template('login.html')
+
+# Route to handle login attempts
+@app.route('/login', methods=['POST'])
+def login():
+    db = get_db()
+    cursor = db.cursor()
+
+    username = request.form['username']
+    password = request.form['password']
+    
+    cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
+    user = cursor.fetchone()
+    
+    if user:
+        # session['logged_in'] = True
+        return 'Logged in successfully!'
+    else:
+        return 'Invalid credentials. Please try again.'
+
+
 # Route to render the registration form
 @app.route('/register-form')
 def register_form():
