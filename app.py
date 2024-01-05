@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, g, session, redirect, url_for
+from flask_bcrypt import Bcrypt
 import sqlite3
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
+bcrypt = Bcrypt(app)
 
 # Function to get the database connection
 def get_db():
@@ -24,7 +26,6 @@ def close_connection(exception):
 def login_form():
     return render_template('login.html')
 
-# Route to handle login attempts
 @app.route('/login', methods=['POST'])
 def login():
     db = get_db()
@@ -33,14 +34,17 @@ def login():
     username = request.form['username']
     password = request.form['password']
     
-    cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
+    cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
     user = cursor.fetchone()
+    
     if user:
-        session['logged_in'] = True  # Set session after successful login
-        session['username'] = username  # Store username in session
-        return redirect(url_for('index'))  # Redirect to index page after login also it takes function name not the route name
-    else:
-        return 'Invalid credentials. Please try again.'
+        stored_hashed_password = user[2]  # Fetch the stored hashed password from the database
+        if bcrypt.check_password_hash(stored_hashed_password, password):
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('index'))
+    
+    return 'Invalid credentials. Please try again.'
 
 
 # Route to render the registration form
@@ -56,8 +60,11 @@ def register_user():
 
     username = request.form['username']
     password = request.form['password']
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    print(f"from register:{password} -> {hashed_password}")
+
     
-    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
     db.commit()
     
     return 'User registered successfully!'
