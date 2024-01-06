@@ -33,8 +33,10 @@ def login():
 
     username = request.form['username']
     password = request.form['password']
+    email = request.form['email']
     
-    cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+    cursor.execute('SELECT * FROM users WHERE username = ? AND email = ?', (username, email))
+
     user = cursor.fetchone()
     
     if user:
@@ -60,11 +62,13 @@ def register_user():
 
     username = request.form['username']
     password = request.form['password']
+    email = request.form['email']  # Get email from the form
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-    print(f"from register:{password} -> {hashed_password}")
+    # print(f"from register:{password} -> {hashed_password}")
 
     
-    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
+    cursor.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', (username, hashed_password, email))
+
     db.commit()
     
     return 'User registered successfully!'
