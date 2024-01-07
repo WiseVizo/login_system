@@ -1,0 +1,7 @@
+TODO:
+    step up verification using email address before registering new users
+    fix login.html UI
+    fix register.html UI
+    Impelement Error handling in registertration and login 
+    Add database documentation
+    

@@ -57,21 +57,57 @@ def register_form():
 # Route to handle user registration
 @app.route('/register', methods=['POST'])
 def register_user():
-    db = get_db()
-    cursor = db.cursor()
+    # db = get_db()
+    # cursor = db.cursor()
 
     username = request.form['username']
     password = request.form['password']
-    email = request.form['email']  # Get email from the form
+    email = request.form['email']  
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     # print(f"from register:{password} -> {hashed_password}")
-
+    print(f"register, user->{username} email-> {email}")
+    session['username'] = username
+    session["email"] = email
+    session["hashed_password"] = hashed_password
     
-    cursor.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', (username, hashed_password, email))
+    # cursor.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', (username, hashed_password, email))
 
-    db.commit()
+    # db.commit()
     
-    return 'User registered successfully!'
+    return redirect(url_for('verify'))
+
+
+
+
+# Route for OTP verification
+@app.route('/verify', methods=['GET', 'POST'])
+def verify():
+
+
+    if request.method == 'POST':
+
+        db = get_db()
+        cursor = db.cursor()
+
+        # Assuming OTP is 0000 for demo purposes
+        entered_otp = request.form.get('otp')
+
+        # Check if the entered OTP is '0000' (replace with actual OTP validation logic)
+        if entered_otp == '0000':
+            username = session.get('username')
+            email = session.get('email')
+            hashed_password = session.get('hashed_password')
+            print(f"user->{username} email-> {email}")
+            # Insert into the database
+            cursor.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', (username, hashed_password, email))
+
+            db.commit()
+
+            return 'Registered successfully!'  # Redirect or render success page
+        else:
+            return 'Invalid OTP. Please try again.'
+
+    return render_template('verify.html')
 
 @app.route('/index')
 def index():
