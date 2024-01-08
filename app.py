@@ -1,10 +1,23 @@
 from flask import Flask, render_template, request, g, session, redirect, url_for
 from flask_bcrypt import Bcrypt
 import sqlite3
+from flask_mail import Mail, Message
+import random
+import string
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 bcrypt = Bcrypt(app)
+
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465  # Use SSL/TLS
+app.config['MAIL_USERNAME'] = 'mecoc1011@gmail.com' # use ur gmail
+app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx troh'  # App password generated for Gmail. search for app passwords in security section of gmail 
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+mail = Mail(app)
 
 # Function to get the database connection
 def get_db():
@@ -12,6 +25,18 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect('users.db')
     return db
+
+
+# Function to send an email
+def send_email(subject, sender, recipients, body):
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = body
+    mail.send(msg)
+
+# Function to generate a random 6-digit OTP
+def generate_otp():
+    otp = ''.join(random.choices(string.digits, k=6))
+    return otp
 
 # Close the database connection at the end of the request
 @app.teardown_appcontext
@@ -70,9 +95,24 @@ def register_user():
     session["email"] = email
     session["hashed_password"] = hashed_password
     
-    # cursor.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', (username, hashed_password, email))
 
-    # db.commit()
+     # Generate OTP
+    otp = generate_otp()
+
+    # Save OTP in session
+    session['otp'] = otp
+
+    # Send OTP to the user's email
+    subject = "Verification Code for Vizo's page"
+    body = f'Your verification code is: {otp}'
+    
+
+    
+    sender = 'mecoc1011@gmail.com'
+    recipients = [email]  # Replace with the recipient's email address
+
+    
+    send_email(subject, sender, recipients, body)
     
     return redirect(url_for('verify'))
 
@@ -89,11 +129,11 @@ def verify():
         db = get_db()
         cursor = db.cursor()
 
-        # Assuming OTP is 0000 for demo purposes
         entered_otp = request.form.get('otp')
+        stored_otp = session.get('otp')
 
         # Check if the entered OTP is '0000' (replace with actual OTP validation logic)
-        if entered_otp == '0000':
+        if entered_otp == stored_otp:
             username = session.get('username')
             email = session.get('email')
             hashed_password = session.get('hashed_password')
@@ -123,3 +163,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

@@ -1,5 +1,6 @@
 TODO:
-    step up verification using email address before registering new users
+    step up verification using email address before registering new users -> done
+    handle none values on every step or this project is gone ////// very very very important
     fix login.html UI
     fix register.html UI
     Impelement Error handling in registertration and login 
