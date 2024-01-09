@@ -47,9 +47,21 @@
         background-color: #0056b3;
       }
     </style>
+    <script>
+      function validateForm() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+
+        if (username.trim() === "" || password.trim() === "") {
+          alert("Username and password cannot be only whitespace.");
+          return false;
+        }
+        return true;
+      }
+    </script>
   </head>
   <body>
-    <form action="/register" method="post">
+    <form action="/register" method="post" onsubmit="return validateForm()">
       <h1>User Registration</h1>
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" required />

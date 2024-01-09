@@ -13,7 +13,7 @@ bcrypt = Bcrypt(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465  # Use SSL/TLS
 app.config['MAIL_USERNAME'] = 'mecoc1011@gmail.com' # use ur gmail
-app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx troh'  # App password generated for Gmail. search for app passwords in security section of gmail 
+app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx trog'  # App password generated for Gmail. search for app passwords in security section of gmail 
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -90,7 +90,7 @@ def register_user():
     email = request.form['email']  
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     # print(f"from register:{password} -> {hashed_password}")
-    print(f"register, user->{username} email-> {email}")
+    # print(f"register, user->{username} email-> {email}")
     session['username'] = username
     session["email"] = email
     session["hashed_password"] = hashed_password
@@ -137,7 +137,7 @@ def verify():
             username = session.get('username')
             email = session.get('email')
             hashed_password = session.get('hashed_password')
-            print(f"user->{username} email-> {email}")
+            # print(f"user->{username} email-> {email}")
             # Insert into the database
             cursor.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', (username, hashed_password, email))
 
