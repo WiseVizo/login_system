@@ -1,3 +1,4 @@
+import sys
 from flask import Flask, render_template, request, g, session, redirect, url_for
 from flask_bcrypt import Bcrypt
 import sqlite3
@@ -13,7 +14,7 @@ bcrypt = Bcrypt(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465  # Use SSL/TLS
 app.config['MAIL_USERNAME'] = 'mecoc1011@gmail.com' # use ur gmail
-app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx trog'  # App password generated for Gmail. search for app passwords in security section of gmail 
+app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx troh'  # App password generated for Gmail. search for app passwords in security section of gmail 
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -21,10 +22,14 @@ mail = Mail(app)
 
 # Function to get the database connection
 def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect('users.db')
-    return db
+    try:
+        db = getattr(g, '_database', None)
+        if db is None:
+            db = g._database = sqlite3.connect('users.db')
+        return db
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+        sys.exit(1)
 
 
 # Function to send an email
@@ -162,5 +167,9 @@ def logout():
     return redirect(url_for('login_form'))  # Redirect to login form after logout
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        app.run(debug=True)
+    except Exception as e:
+        print(f"Error running the app: {e}")
+        sys.exit(1)
     
