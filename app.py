@@ -14,7 +14,7 @@ bcrypt = Bcrypt(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465  # Use SSL/TLS
 app.config['MAIL_USERNAME'] = 'mecoc1011@gmail.com' # use ur gmail
-app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx troh'  # App password generated for Gmail. search for app passwords in security section of gmail 
+app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx trog'  # App password generated for Gmail. search for app passwords in security section of gmail 
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 

@@ -1,8 +1,3 @@
 TODO:
-    step up verification using email address before registering new users -> done
-    handle none values on every step or this project is gone ////// very very very important -> done
-    fix login.html UI
-    fix register.html UI
-    Impelement Error handling in registertration and login 
-    Add database documentation -> done
-    
+    write unit tests, interagation tests, functional tests and E2E tests for this app.
+    implement frontend in react with the help of APIs.
