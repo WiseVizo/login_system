@@ -53,6 +53,29 @@ class TestApp(unittest.TestCase):
         self.assertIn(b'OTP Verification', response.data) # check if opt verification showed up
         self.assertEqual(response.status_code, 200)
 
+        # After successful registration, get OTP from session
+        with self.app as c:
+            with c.session_transaction() as sess:
+                otp = sess.get('otp')
+
+        # Simulate submitting the OTP verification form
+        response = self.app.post('/verify', data=dict(
+            otp=otp
+        ), follow_redirects=True)
+
+    # Check if the response indicates successful verification
+        self.assertIn(b'Registered successfully!', response.data)
+        self.assertEqual(response.status_code, 200)
+
+    # Attempt OTP verification with an incorrect OTP
+        response = self.app.post('/verify', data=dict(
+            otp='12345'  # Replace with an incorrect OTP
+         ), follow_redirects=True)
+
+    # Check if the application responds appropriately (e.g., displays an error message)
+        self.assertIn(b'Invalid OTP', response.data)
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
