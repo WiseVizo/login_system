@@ -1,17 +1,20 @@
 import sys
-from flask import Flask, render_template, request, g, session, redirect, url_for
+from flask import Flask, render_template, request, g, session, redirect, url_for, jsonify
 from flask_bcrypt import Bcrypt
 import sqlite3
 from flask_mail import Mail, Message
 import random
 import string
 
+from flask_cors import CORS
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 bcrypt = Bcrypt(app)
-
+CORS(app)
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+
 app.config['MAIL_PORT'] = 465  # Use SSL/TLS
 app.config['MAIL_USERNAME'] = 'mecoc1011@gmail.com' # use ur gmail
 app.config['MAIL_PASSWORD'] = 'idef tvaq vkvx trog'  # App password generated for Gmail. search for app passwords in security section of gmail 
@@ -55,6 +58,32 @@ def close_connection(exception):
 @app.route('/')
 def login_form():
     return render_template('login.html')
+
+@app.route("/react/login", methods=["POST", "GET"])
+def react_login():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    email = data.get("email")
+    # print(f"hiii from react: {username, password, email}")
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute('SELECT * FROM users WHERE username = ? AND email = ?', (username, email))
+
+    user = cursor.fetchone()
+    # print(user)
+    
+    if user:
+        stored_hashed_password = user[2]  # Fetch the stored hashed password from the database
+        if bcrypt.check_password_hash(stored_hashed_password, password):
+            session['logged_in'] = True
+            session['username'] = username
+            # print(f"yep logged in as{username}")
+            return jsonify({"task": "success", "username": username})
+    
+    return jsonify({"task": "failed"})
+    
 
 @app.route('/login', methods=['POST'])
 def login():
